@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap URL
+Sitemap: https://erensprojects.web.tr/sitemap.xml
