@@ -14,7 +14,7 @@ interface ArrayFieldProps {
   onChangeAction: (path: string, value: any) => void;
 }
 
-const MotionButton = motion(Button);
+const MotionButton = motion.create(Button);
 
 const getAddButtonText = (fieldKey: string) => {
   const mapping: Record<string, string> = {
