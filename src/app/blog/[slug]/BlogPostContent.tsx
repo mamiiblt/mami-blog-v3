@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Post } from "@/lib/blog";
 import { TableOfContents } from "@/components/blog/TableOfContents";
 import { Clock, Calendar, Tags } from "@/components/Icons";
@@ -131,19 +131,13 @@ export function BlogPostContent({ post, headings }: BlogPostContentProps) {
             ]}
             components={{
               h1: ({ node, ...props }) => (
-                <motion.h1
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
+                <h1
                   {...props}
                   className="scroll-mt-24 text-4xl font-bold my-8"
                 />
               ),
               h2: ({ node, ...props }) => (
-                <motion.h2
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
+                <h2
                   {...props}
                   className="scroll-mt-24 text-3xl font-bold my-6"
                 />

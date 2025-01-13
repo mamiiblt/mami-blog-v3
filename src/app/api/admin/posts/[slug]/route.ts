@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
 import fs from "fs/promises";
 import path from "path";
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { slug: string } },
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
     const { password } = await request.json();
@@ -14,10 +14,11 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const resolvedParams = await params;
     const filePath = path.join(
       process.cwd(),
       "content/blog",
-      `${params.slug}.md`,
+      `${resolvedParams.slug}.md`,
     );
     await fs.unlink(filePath);
 

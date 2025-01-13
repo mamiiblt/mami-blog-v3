@@ -7,9 +7,9 @@ import Link from "next/link";
 export default async function BlogPostPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const { slug } = params;
+  const { slug } = await params;
   const post = await getPostBySlug(slug);
 
   if (!post) {
