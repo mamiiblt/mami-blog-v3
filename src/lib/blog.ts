@@ -3,7 +3,7 @@ import path from "path";
 import matter from "gray-matter";
 import { isAuthenticated } from "./auth";
 
-const BLOG_DIR = path.join(process.cwd(), "content", "blog");
+const BLOG_DIR = path.join(process.cwd(), "public", "content", "blogs");
 
 export interface Post {
   slug: string;

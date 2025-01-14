@@ -17,7 +17,7 @@ export async function DELETE(
     const resolvedParams = await params;
     const filePath = path.join(
       process.cwd(),
-      "content/blog",
+      "public/content/blogs",
       `${resolvedParams.slug}.md`,
     );
     await fs.unlink(filePath);
