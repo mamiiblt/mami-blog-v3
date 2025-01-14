@@ -7,6 +7,7 @@ import { Alert } from "@/components/ui/alert";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { formatISODate } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
 
 interface NewPostFormProps {
   onSuccessAction: () => void;
@@ -25,6 +26,7 @@ export function NewPostForm({ onSuccessAction, password }: NewPostFormProps) {
     author: "",
     image: "",
   });
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,6 +34,16 @@ export function NewPostForm({ onSuccessAction, password }: NewPostFormProps) {
     setError(null);
 
     try {
+      // Validate required fields
+      if (
+        !formData.title ||
+        !formData.slug ||
+        !formData.description ||
+        !formData.content
+      ) {
+        throw new Error("Please fill in all required fields");
+      }
+
       const response = await fetch("/api/admin/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,15 +51,20 @@ export function NewPostForm({ onSuccessAction, password }: NewPostFormProps) {
           password,
           post: {
             ...formData,
-            tags: formData.tags.split(",").map((tag) => tag.trim()),
+            tags: formData.tags
+              ? formData.tags.split(",").map((tag) => tag.trim())
+              : [],
             date: formatISODate(new Date()),
-            ...(formData.image && { image: formData.image }),
-            ...(formData.author && { author: formData.author }),
+            ...(formData.image?.trim() && { image: formData.image }),
+            ...(formData.author?.trim() && { author: formData.author }),
           },
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to create post");
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to create post");
+      }
 
       setFormData({
         title: "",
@@ -58,9 +75,22 @@ export function NewPostForm({ onSuccessAction, password }: NewPostFormProps) {
         author: "",
         image: "",
       });
+
+      toast({
+        title: "Success",
+        description: "Post created successfully",
+        variant: "success",
+      });
+
       onSuccessAction();
     } catch (error) {
       setError(error instanceof Error ? error.message : "Error creating post");
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Error creating post",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }

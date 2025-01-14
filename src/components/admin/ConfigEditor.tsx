@@ -12,6 +12,7 @@ import {
   type ConfigEditorProps,
 } from "./config-editor/types";
 import { ConfigSection } from "./config-editor/ConfigSection";
+import { useToast } from "@/hooks/use-toast";
 
 export function ConfigEditor({
   config,
@@ -20,21 +21,37 @@ export function ConfigEditor({
 }: ConfigEditorProps) {
   const [configState, setConfigState] = useState(config);
   const [error, setError] = useState<string | null>(null);
-
-  const handleReset = () => {
-    setConfigState(config);
-    setError(null);
-  };
+  const { toast } = useToast();
 
   const handleSave = async () => {
     try {
       setError(null);
       await onSaveAction(configState);
+      toast({
+        title: "Success",
+        description: "Configuration saved successfully",
+        variant: "success",
+      });
     } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "Failed to save configuration",
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to save configuration";
+      setError(errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
     }
+  };
+
+  const handleReset = () => {
+    setConfigState(config);
+    setError(null);
+    toast({
+      title: "Success",
+      description: "Configuration reset to defaults",
+      variant: "default",
+    });
   };
 
   const handleChange = (path: string, value: any) => {

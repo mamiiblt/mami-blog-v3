@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
 import { createPost, getAllPosts } from "@/lib/blog";
 
@@ -14,7 +14,7 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const { password, post } = await request.json();
 
@@ -25,7 +25,10 @@ export async function POST(request: Request) {
     const success = await createPost(post, password);
 
     if (!success) {
-      throw new Error("Failed to create post");
+      return NextResponse.json(
+        { error: "Failed to create post" },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({ success: true });

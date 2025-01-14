@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { SITE_CONFIG } from "@/config/config";
 import { defaultMetadata } from "@/config/metadata";
+import { Toaster } from "@/components/ui/toaster";
 
 const appleTitle = SITE_CONFIG.siteName;
 
@@ -31,6 +32,7 @@ export default function RootLayout({
             defaultTheme="light"
             storageKey="theme"
           >
+            <Toaster />
             <Navbar />
             <main className="flex-1">{children}</main>
             <Footer />

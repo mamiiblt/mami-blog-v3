@@ -4,7 +4,12 @@ import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BlogCard } from "@/components/blog/BlogCard";
 import { Post } from "@/lib/blog";
-import { ChevronLeft, ChevronRight, Search } from "@/components/Icons";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  RefreshCw,
+} from "@/components/Icons";
 
 interface ClientBlogContentProps {
   title: string;
@@ -13,19 +18,78 @@ interface ClientBlogContentProps {
 }
 
 const POSTS_PER_PAGE = 6;
-const DEBOUNCE_DELAY = 300; // 300ms delay
+const DEBOUNCE_DELAY = 300;
+const REFRESH_COOLDOWN = 2000;
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.3,
+    },
+  },
+  exit: { opacity: 0 },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+    },
+  },
+};
 
 export function ClientBlogContent({
   title,
   description,
-  posts,
+  posts: initialPosts,
 }: ClientBlogContentProps) {
+  const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [canRefresh, setCanRefresh] = useState(true);
 
-  // Extract unique tags
+  const fetchLatestPosts = async () => {
+    if (!canRefresh || isRefreshing) return;
+
+    try {
+      setIsRefreshing(true);
+      setIsLoading(true);
+      setCanRefresh(false);
+
+      const response = await fetch("/api/admin/posts");
+      const data = await response.json();
+
+      if (data.posts) {
+        setPosts([]);
+        setTimeout(() => {
+          setPosts(data.posts);
+        }, 300);
+      }
+    } catch (error) {
+      console.error("Failed to fetch latest posts:", error);
+    } finally {
+      setIsRefreshing(false);
+      setIsLoading(false);
+      setTimeout(() => setCanRefresh(true), REFRESH_COOLDOWN);
+    }
+  };
+
+  useEffect(() => {
+    const intervalId = setInterval(fetchLatestPosts, 30000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   const allTags = useMemo(() => {
     const tags = new Set<string>();
     posts.forEach((post) => {
@@ -34,7 +98,6 @@ export function ClientBlogContent({
     return Array.from(tags).sort();
   }, [posts]);
 
-  // Debounce search query
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
@@ -57,7 +120,6 @@ export function ClientBlogContent({
     return matchesSearch && matchesTags;
   });
 
-  // Reset to first page when search query or tags change
   useEffect(() => {
     setCurrentPage(1);
   }, [debouncedSearchQuery, selectedTags]);
@@ -77,66 +139,85 @@ export function ClientBlogContent({
   return (
     <>
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
         className="space-y-6"
       >
         <div className="flex flex-col md:flex-row gap-6 md:justify-between md:items-center">
-          <div className="space-y-3">
+          <motion.div variants={itemVariants} className="space-y-3">
             <motion.h1
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
+              variants={itemVariants}
               className="text-3xl md:text-4xl font-bold tracking-tighter"
             >
               {title}
             </motion.h1>
             <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
+              variants={itemVariants}
               className="text-base md:text-lg text-muted-foreground"
             >
               {description}
             </motion.p>
-          </div>
+          </motion.div>
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-            className="w-full md:w-auto relative"
+            variants={itemVariants}
+            className="flex gap-4 w-full md:w-auto"
           >
-            <input
-              type="text"
-              placeholder="Search posts..."
-              className="w-full md:w-72 pl-10 pr-4 py-2.5 border rounded-lg shadow-sm focus:ring-2 focus:ring-primary/20 transition-all"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={fetchLatestPosts}
+              className={`p-2.5 border rounded-lg shadow-sm hover:bg-secondary transition-all ${
+                !canRefresh ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={!canRefresh || isRefreshing}
+            >
+              <motion.div
+                animate={{
+                  rotate: isRefreshing ? 360 : 0,
+                }}
+                transition={{
+                  duration: 1,
+                  ease: "linear",
+                  repeat: isRefreshing ? Infinity : 0,
+                }}
+              >
+                <RefreshCw className="h-5 w-5" />
+              </motion.div>
+            </motion.button>
+            <motion.div
+              variants={itemVariants}
+              className="w-full md:w-auto relative"
+            >
+              <input
+                type="text"
+                placeholder="Search posts..."
+                className="w-full md:w-72 pl-10 pr-4 py-2.5 border rounded-lg shadow-sm focus:ring-2 focus:ring-primary/20 transition-all bg-background dark:bg-background"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+            </motion.div>
           </motion.div>
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          variants={containerVariants}
           className="overflow-x-auto scrollbar-hide"
         >
           <div className="flex flex-nowrap md:flex-wrap gap-3 py-4">
             {allTags.map((tag, i) => (
               <motion.button
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1 * i }}
                 key={tag}
+                variants={itemVariants}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => toggleTag(tag)}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all
                   ${
                     selectedTags.includes(tag)
                       ? "bg-primary text-primary-foreground shadow-md scale-105"
-                      : "bg-secondary hover:bg-secondary/80 hover:scale-105"
+                      : "bg-secondary hover:bg-secondary/80"
                   }`}
               >
                 #{tag}
@@ -149,18 +230,32 @@ export function ClientBlogContent({
       <motion.div
         initial={{ opacity: 0, scaleX: 0 }}
         animate={{ opacity: 1, scaleX: 1 }}
-        transition={{ delay: 0.3, duration: 0.8 }}
+        transition={{
+          duration: 0.8,
+          ease: "easeInOut",
+        }}
         className="border-b border-accent my-8"
       />
 
       <AnimatePresence mode="wait">
-        {paginatedPosts.length === 0 ? (
+        {isLoading ? (
+          <motion.div
+            key="loading"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="text-center py-12 text-muted-foreground text-lg"
+          >
+            Loading posts...
+          </motion.div>
+        ) : paginatedPosts.length === 0 ? (
           <motion.div
             key="empty"
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.3, type: "spring" }}
             className="text-center py-12 text-muted-foreground text-lg"
           >
             No blog posts found.
@@ -168,18 +263,17 @@ export function ClientBlogContent({
         ) : (
           <motion.div
             key="grid"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            exit="exit"
             className="grid gap-8 md:gap-10"
           >
             {paginatedPosts.map((post, index) => (
               <motion.div
                 key={post.slug}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                variants={itemVariants}
+                custom={index}
               >
                 <BlogCard post={post} index={index} />
               </motion.div>
@@ -190,22 +284,29 @@ export function ClientBlogContent({
 
       {totalPages > 1 && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
           className="flex justify-center items-center gap-3 md:gap-5 mt-12"
         >
-          <button
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
             className="p-2 md:p-2.5 rounded-lg hover:bg-secondary disabled:opacity-50 transition-all"
           >
             <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
-          </button>
-          <span className="text-sm md:text-base font-medium">
+          </motion.button>
+          <motion.span
+            variants={itemVariants}
+            className="text-sm md:text-base font-medium"
+          >
             Page {currentPage} of {totalPages}
-          </span>
-          <button
+          </motion.span>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
             onClick={() =>
               setCurrentPage((prev) => Math.min(prev + 1, totalPages))
             }
@@ -213,7 +314,7 @@ export function ClientBlogContent({
             className="p-2 md:p-2.5 rounded-lg hover:bg-secondary disabled:opacity-50 transition-all"
           >
             <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
-          </button>
+          </motion.button>
         </motion.div>
       )}
     </>

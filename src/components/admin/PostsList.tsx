@@ -18,6 +18,7 @@ import {
 import type { BlogPost } from "@/types/admin";
 import { NewPostForm } from "./NewPostForm";
 import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
 
 interface PostsListProps {
   posts: BlogPost[];
@@ -30,6 +31,7 @@ export function PostsList({ posts, onDeleteAction, password }: PostsListProps) {
   const [error, setError] = useState<string | null>(null);
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
   const [showNewPostForm, setShowNewPostForm] = useState(false);
+  const { toast } = useToast();
 
   const handleDelete = async (slug: string) => {
     setIsLoading(true);
@@ -45,8 +47,19 @@ export function PostsList({ posts, onDeleteAction, password }: PostsListProps) {
       if (!response.ok) throw new Error("Failed to delete post");
 
       onDeleteAction();
+      toast({
+        title: "Success",
+        description: "Post deleted successfully",
+        variant: "success",
+      });
     } catch (error) {
       setError(error instanceof Error ? error.message : "Error deleting post");
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Error deleting post",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
       setPostToDelete(null);
