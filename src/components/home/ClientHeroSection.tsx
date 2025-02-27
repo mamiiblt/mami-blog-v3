@@ -19,7 +19,11 @@ export function ClientHeroSection() {
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tighter leading-tight"
         >
           <span className="bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent hover:from-primary/90 hover:to-primary transition-colors duration-300">
-            {SITE_CONFIG.homeTitle}
+            Welcome to
+          </span>
+          <br/>
+          <span className="bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent hover:from-primary/90 hover:to-primary transition-colors duration-300">
+            mamiblt's land
           </span>
         </motion.h1>
 

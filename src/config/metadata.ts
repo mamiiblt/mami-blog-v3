@@ -10,7 +10,7 @@ if (!siteUrl) {
 export const defaultMetadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${SITE_CONFIG.name} | ${SITE_CONFIG.siteName}`,
+    default: `${SITE_CONFIG.name}`,
     template: `%s`,
   },
   description: SITE_CONFIG.description,

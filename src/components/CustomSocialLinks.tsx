@@ -46,7 +46,7 @@ export default function CustomSocialLinks({
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-foreground transition-all duration-200 hover:scale-110"
+            className=" transition-all duration-200 hover:scale-110"
           >
             <Icon
               className={cn(

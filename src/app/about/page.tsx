@@ -1,10 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { SITE_CONFIG } from "@/config/config";
 import CustomSocialLinks from "@/components/CustomSocialLinks";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Coffee } from "@/components/Icons";
 
 const RenderContent = ({ content }: { content: string }) => {
   const parts = content.split(/(\[.*?\]\(.*?\))/g);
@@ -35,83 +36,64 @@ const RenderContent = ({ content }: { content: string }) => {
 
 export default function AboutPage() {
   return (
-    <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-      <div className="space-y-8">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="space-y-4"
-        >
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight">
-            {SITE_CONFIG.aboutTitle}
-          </h1>
-          <p className="text-muted-foreground text-lg sm:text-xl">
-            {SITE_CONFIG.aboutDescription}
-          </p>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, scaleX: 0 }}
-          animate={{ opacity: 1, scaleX: 1 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-          className="border-b border-accent"
-        />
-        <div className="container px-4 py-8 sm:py-16 lg:py-24">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            className="flex flex-col lg:flex-row items-start gap-12 max-w-6xl mx-auto"
-          >
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="flex-1 space-y-8"
-            >
-              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
-                {SITE_CONFIG.aboutContentTitle}
-              </h2>
-              <div className="prose dark:prose-invert max-w-none">
-                <p className="text-lg sm:text-xl leading-relaxed text-muted-foreground">
-                  <RenderContent content={SITE_CONFIG.aboutContent} />
-                </p>
-              </div>
+    <AnimatePresence >
+          <div className="py-5">
+    <div className="sm:grid grid-cols-8 px-6 py-5 sm:py-9 gap-5 container max-w-5xl mx-auto">
+      <div className="col-span-5 max-w-md">
+        <div className="hidden sm:block flex justify-between">
+          <div>
+            <h1 className="text-xl sm:text-4xl pb-2 font-bold">
+              Muhammed Ali
+            </h1>
+            <p className="text-sm text-muted-foreground text-base sm:text-2xl pb-2">
+              a.k.a mami, muhammedmgs
+            </p>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.4 }}
-                className="pt-6"
-              >
-                <h3 className="text-2xl font-semibold mb-6">Connect with me</h3>
-                <CustomSocialLinks
-                  platforms={["Telegram", "Mail"]}
-                  iconClassName="h-8 w-8 hover:scale-110 transition-transform duration-200"
+            <div className="my-3 space-x-2 md:space-x-3 pb-2">
+            <CustomSocialLinks
+                  platforms={["Github", "Instagram", "Telegram", "Twitter", "Spotify"]}
+                  iconClassName="h-6 w-6 hover:scale-95 transition-transform duration-200"
                   className="gap-8"
                 />
-              </motion.div>
-            </motion.div>
+            </div>
+          </div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex-1 w-full"
-            >
-              <div className="aspect-[16/9] relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                <Image
-                  src={SITE_CONFIG.aboutHeroImage}
-                  alt="About page hero image"
-                  fill
-                  className="object-cover transform hover:scale-105 transition-transform duration-500"
-                  priority
-                />
-              </div>
-            </motion.div>
-          </motion.div>
         </div>
+        <div className="sm:hidden flex justify-center text-center">
+          <div>
+            <div className="sm:hidden col-span-3 pb-10 flex justify-center dark:text-[#F1F2F4] text-center">
+              <Image alt="Profile Picture" src="/mamiiblt.jpg" width="140" height="140" quality="50" className="rounded-[35px]" />
+            </div>
+            <h1 className="text-xl sm:text-4xl pb-2 font-bold text-center">
+              Muhammed Ali Bulut
+            </h1>
+            <p className="text-sm sm:text-2xl text-muted-foreground text-base pb-2 font-normal text-center">
+              a.k.a mami, mamiiblt
+            </p>
+            <div className="my-3 space-x-2 md:space-x-3 pb-2">
+            <CustomSocialLinks
+                  platforms={["Github", "Instagram", "Telegram", "Twitter", "Spotify"]}
+                  iconClassName="h-6 w-6 hover:scale-95 transition-transform duration-200"
+                  className="gap-5"
+                />
+            </div>
+          </div>
+        </div>
+
+        <p className="text-center sm:text-left text-muted-foreground text-base pb-4">Hello! I am Muhammad Ali, usually I'm working mainly on Android development, Web, AI and some reverse engineering projects / apps. When I'm not crafting code, you can find me summoning solutions to problems on online judges. Just don't ask me to cast any love spells, my magic only works on machines!</p>
+        <Button
+          size={"lg"}
+          variant={"outline-gradient"}
+          className="w-full text-center justify-content sm:w-auto transform hover:scale-105 transition-transform duration-200">
+            <Coffee />
+            <Link href="https://buymeacoffee.com/mamiiblt" className="ml-2">Buy me a coffee</Link>
+        </Button>      
+          </div>
+      <div className="hidden sm:block col-span-3">
+        <Image alt="Profile Picture" src="/mamiiblt.jpg" width="450" height="500" quality="50" className="rounded-md" />
       </div>
     </div>
+  </div>
+  </AnimatePresence>
   );
 }

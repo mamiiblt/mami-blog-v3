@@ -50,17 +50,6 @@ export function BlogPostContent({ post, headings }: BlogPostContentProps) {
             {post.description}
           </p>
 
-          {post.author && (
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-              className="flex items-center gap-4 bg-secondary/50 p-4 rounded-lg"
-            >
-              <div className="font-medium text-lg">By {post.author}</div>
-            </motion.div>
-          )}
-
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

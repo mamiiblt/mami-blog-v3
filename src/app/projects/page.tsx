@@ -3,41 +3,16 @@
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { ExternalLink, Github } from "@/components/Icons";
+import { ExternalLink, Github, LinkIcon, Platform } from "@/components/Icons";
 import { SITE_CONFIG } from "@/config/config";
 
 export default function ProjectsPage() {
   return (
     <div className="container max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-12 sm:py-16">
       <div className="space-y-12">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="space-y-4"
-        >
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tighter">
-            {SITE_CONFIG.projectTitle}
-          </h1>
-          <p className="text-muted-foreground text-base sm:text-lg max-w-3xl">
-            {SITE_CONFIG.projectDescription}
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scaleX: 0 }}
-          animate={{ opacity: 1, scaleX: 1 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-          className="border-b border-accent"
-        />
 
         <AnimatePresence>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="grid gap-8 md:gap-10"
-          >
-            {SITE_CONFIG.projects.map((project, index) => (
+        {SITE_CONFIG.projects.map((project, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 30 }}
@@ -71,38 +46,36 @@ export default function ProjectsPage() {
                       {project.description}
                     </p>
 
-                    <div className="flex flex-wrap gap-2">
-                      {project.languages.map((lang, i) => (
-                        <span
-                          key={i}
-                          className="px-4 py-1.5 text-sm rounded-full bg-secondary/60 text-secondary-foreground backdrop-blur-sm"
-                        >
-                          {lang}
-                        </span>
-                      ))}
-                    </div>
-
                     <div className="flex gap-8 pt-3">
-                      {project.github && (
+                      {project.platform && (
+                        <div
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2.5 text-sm font-semibold text-muted-foreground hover:text-primary transition-colors duration-300"
+                        >
+                          <Platform className="h-5 w-5" />
+                          { project.platform }
+                        </div>
+                      )}
+                      {project.github !== null && project.github !== undefined && (
                         <Link
-                          href={project.github}
+                          href={"https://github.com/" + project.github}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2.5 text-sm font-semibold text-muted-foreground hover:text-primary transition-colors duration-300"
                         >
-                          <Github className="h-5 w-5" />
-                          Source Code
+                        <Github className="h-5 w-5" />
+                        { project.github }
                         </Link>
                       )}
-                      {project.demo && (
+                      {project.link && (
                         <Link
-                          href={project.demo}
+                          href={"" + project.link}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2.5 text-sm font-semibold text-muted-foreground hover:text-primary transition-colors duration-300"
                         >
-                          <ExternalLink className="h-5 w-5" />
-                          Live Demo
+                          <LinkIcon className="h-5 w-5" />
+                          { project.link }
                         </Link>
                       )}
                     </div>
@@ -110,7 +83,6 @@ export default function ProjectsPage() {
                 </div>
               </motion.div>
             ))}
-          </motion.div>
         </AnimatePresence>
       </div>
     </div>

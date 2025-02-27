@@ -1,7 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
 import matter from "gray-matter";
-import { isAuthenticated } from "./auth";
 
 const BLOG_DIR = path.join(process.cwd(), "public", "content", "blogs");
 
@@ -82,66 +81,6 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
     } as Post;
   } catch (error) {
     return null;
-  }
-}
-
-export async function createPost(
-  post: Post,
-  password: string,
-): Promise<boolean> {
-  try {
-    if (!isAuthenticated(password)) {
-      throw new Error("Unauthorized");
-    }
-
-    // Validate required fields
-    if (
-      !post.title ||
-      !post.slug ||
-      !post.date ||
-      !post.description ||
-      !post.content
-    ) {
-      throw new Error("Missing required fields");
-    }
-
-    // Ensure the blog directory exists
-    try {
-      await fs.access(BLOG_DIR);
-    } catch {
-      await fs.mkdir(BLOG_DIR, { recursive: true });
-      console.log(`Created directory: ${BLOG_DIR}`);
-    }
-
-    const filePath = path.join(BLOG_DIR, `${post.slug}.md`);
-
-    // Create frontmatter object
-    const frontmatter: Record<string, any> = {
-      title: post.title,
-      date: post.date,
-      description: post.description,
-      tags: post.tags || [],
-    };
-
-    // Add optional fields only if they exist and are not empty
-    if (post.author?.trim()) {
-      frontmatter.author = post.author;
-    }
-
-    if (post.image?.trim()) {
-      frontmatter.image = post.image;
-    }
-
-    // Use gray-matter to stringify the content
-    const fileContent = matter.stringify(post.content, frontmatter);
-
-    // Write the file
-    await fs.writeFile(filePath, fileContent, "utf8");
-    ("");
-    return true;
-  } catch (error) {
-    console.error("Error creating post:", error);
-    throw error; // Rethrow the error to handle it in the API route
   }
 }
 

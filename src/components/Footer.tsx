@@ -6,9 +6,12 @@ import { SITE_CONFIG } from "@/config/config";
 import CustomSocialLinks from "./CustomSocialLinks";
 import { FooterLoading } from "./loading";
 import { motion } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
   const [loading, setLoading] = React.useState(true);
+  const pathname = usePathname();
+  
 
   React.useEffect(() => {
     setLoading(false);
@@ -34,7 +37,9 @@ export default function Footer() {
   };
 
   return (
-    <footer className="border-t border-border bg-gradient-to-b from-background to-background/50 backdrop-blur-sm">
+    <div>
+        {pathname !== "/about" && (
+      <footer className="border-t border-border bg-gradient-to-b from-background to-background/50 backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <motion.div
           variants={container}
@@ -47,13 +52,13 @@ export default function Footer() {
               whileHover={{ scale: 1.02 }}
               className="text-2xl font-bold text-foreground bg-clip-text bg-gradient-to-r from-primary to-primary/80"
             >
-              {SITE_CONFIG.footerTitle}
+              Muhammed Ali
             </motion.div>
             <div className="text-base text-muted-foreground/80">
-              © {new Date().getFullYear()} {SITE_CONFIG.copyright}
+             You can find my social accounts below!
             </div>
             <CustomSocialLinks
-              platforms={["all"]}
+              platforms={["Github", "Telegram", "Twitter", "Instagram"]}
               className="flex-wrap gap-4"
               iconClassName="h-6 w-6 hover:scale-110 transition-transform duration-300"
               direction="row"
@@ -103,16 +108,18 @@ export default function Footer() {
               <motion.a
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                href={`mailto:${SITE_CONFIG.email}`}
+                href={`https://t.me/mamiiblt`}
                 className="group text-base text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center gap-2 w-fit rounded-lg hover:bg-secondary/30 px-3 py-2"
               >
-                <Icons.Mail className="h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
-                <span className="group-hover:underline">Email me</span>
+                <Icons.Telegram className="h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
+                <span className="group-hover:underline">t.me/mamiiblt</span>
               </motion.a>
             </div>
           </motion.div>
         </motion.div>
       </div>
     </footer>
+    )}
+    </div>
   );
 }

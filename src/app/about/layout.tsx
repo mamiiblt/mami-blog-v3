@@ -4,8 +4,8 @@ import { defaultMetadata } from "@/config/metadata";
 
 export const metadata: Metadata = {
   ...defaultMetadata,
-  title: `About - ${SITE_CONFIG.name} | ${SITE_CONFIG.siteName}`,
-  description: SITE_CONFIG.aboutDescription,
+  title: `About mamiiblt`,
+  description: "Everything about me",
 };
 
 export default function AboutLayout({

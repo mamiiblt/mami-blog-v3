@@ -4,7 +4,7 @@ import { defaultMetadata } from "@/config/metadata";
 
 export const metadata: Metadata = {
   ...defaultMetadata,
-  title: `Blogs - ${SITE_CONFIG.name} | ${SITE_CONFIG.siteName}`,
+  title: `Blogs | mamiiblt`,
   description: SITE_CONFIG.blogDescription,
 };
 
