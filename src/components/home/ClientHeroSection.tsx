@@ -23,7 +23,7 @@ export function ClientHeroSection() {
           </span>
           <br/>
           <span className="bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent hover:from-primary/90 hover:to-primary transition-colors duration-300">
-            mamiblt's land
+            mamiiblt's island
           </span>
         </motion.h1>
 
